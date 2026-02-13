@@ -1,0 +1,22 @@
+name: Create Master Video
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Tools
+        run: |
+          choco install ffmpeg yt-dlp
+
+      - name: Run PowerShell Script
+        run: ./stream_to_runnel.ps1
+
+      - name: Upload Video to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: Desselgem-Master-Show
+          path: Desselgem_Master_Show.mp4

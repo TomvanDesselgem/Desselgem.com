@@ -12,18 +12,21 @@ $sketches = @(
     @{Artist="Jeroen Maes"; Title="Controle"}
 )
 
-Write-Host "Stap 1: Downloaden van YouTube (Poging met omweg)..."
-# We voegen extra parameters toe om minder op een bot te lijken
+Write-Host "Stap 1: Downloaden van YouTube via alternatieve route..."
+
+# We gebruiken 'ios' als client, die wordt minder vaak geblokkeerd dan de standaard web-client
 yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" `
        --merge-output-format mp4 `
-       --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" `
+       --extractor-args "youtube:player_client=ios,web" `
        --no-check-certificate `
+       --force-ipv4 `
+       --sleep-requests 2 `
        -o "%(playlist_index)s.mp4" "https://youtube.com/playlist?list=PLsirpUvJXKA60orwh-ygOoq_mV3HnJAWn"
 
-Write-Host "Stap 2: Controleren of de bestanden er zijn..."
+Write-Host "Stap 2: Checken of er iets binnenkwam..."
 $files = Get-ChildItem *.mp4
-if ($files.Count -eq 0) {
-    Write-Error "YouTube blokkeert de download nog steeds. Probeer het script over 10 minuten nog eens of gebruik Plan B."
+if ($files.Count -lt 2) {
+    Write-Error "YouTube houdt de poort nog steeds dicht. Ze herkennen de server van GitHub."
     exit 1
 }
 
